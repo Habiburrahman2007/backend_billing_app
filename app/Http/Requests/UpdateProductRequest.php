@@ -31,6 +31,7 @@ class UpdateProductRequest extends FormRequest
             ],
             'price'   => ['sometimes', 'required', 'numeric', 'min:0.01'],
             'stock'   => ['sometimes', 'required', 'integer', 'min:0'],
+            'image'   => ['nullable', 'string'],
         ];
     }
 }

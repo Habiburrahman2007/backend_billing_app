@@ -25,6 +25,7 @@ class StoreProductRequest extends FormRequest
             ],
             'price'   => ['required', 'numeric', 'min:0.01'],
             'stock'   => ['required', 'integer', 'min:0'],
+            'image'   => ['nullable', 'string'],
         ];
     }
 }

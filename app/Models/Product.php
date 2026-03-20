@@ -20,6 +20,7 @@ class Product extends Model
         'barcode',
         'price',
         'stock',
+        'image',
     ];
 
     protected function casts(): array
