@@ -8,6 +8,7 @@ use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -67,9 +68,21 @@ class ProductController extends Controller
     {
         $this->authorize('delete', $product);
 
-        $product->delete();
-
-        return response()->json(['message' => 'Product deleted successfully.'], 200);
+        try {
+            $product->delete();
+            return response()->json(['message' => 'Product deleted successfully.'], 200);
+        } catch (QueryException $e) {
+            // Check if it's a foreign key constraint violation (Integrity constraint violation)
+            // SQLSTATE 23000 is for integrity constraint violations
+            if ($e->getCode() == "23000" || str_contains($e->getMessage(), 'Integrity constraint violation')) {
+                return response()->json([
+                    'message' => 'Gagal menghapus: Produk ini sudah pernah digunakan dalam transaksi dan tidak bisa dihapus demi integritas data.'
+                ], 400);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 
     /**

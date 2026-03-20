@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,7 +15,8 @@ class UpdateProductRequest extends FormRequest
 
     public function rules(): array
     {
-        $productId = $this->route('product')?->id;
+        $productParam = $this->route('product');
+        $productId = $productParam instanceof Product ? $productParam->id : $productParam;
 
         return [
             'name'    => ['sometimes', 'required', 'string', 'max:255'],
