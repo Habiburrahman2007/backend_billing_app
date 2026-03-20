@@ -9,6 +9,7 @@ use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -44,7 +45,7 @@ class ProductController extends Controller
      */
     public function show(Request $request, Product $product): JsonResponse
     {
-        $this->authorize('view', $product);
+        Gate::authorize('view', $product);
 
         return response()->json(new ProductResource($product));
     }
@@ -54,7 +55,7 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product): JsonResponse
     {
-        $this->authorize('update', $product);
+        Gate::authorize('update', $product);
 
         $product->update($request->validated());
 
@@ -66,7 +67,7 @@ class ProductController extends Controller
      */
     public function destroy(Request $request, Product $product): JsonResponse
     {
-        $this->authorize('delete', $product);
+        Gate::authorize('delete', $product);
 
         try {
             $product->delete();

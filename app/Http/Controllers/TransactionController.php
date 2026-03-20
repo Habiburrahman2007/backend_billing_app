@@ -9,6 +9,7 @@ use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class TransactionController extends Controller
 {
@@ -74,7 +75,7 @@ class TransactionController extends Controller
      */
     public function show(Request $request, Transaction $transaction): JsonResponse
     {
-        $this->authorize('view', $transaction);
+        Gate::authorize('view', $transaction);
 
         return response()->json(new TransactionResource($transaction->load('items')));
     }
