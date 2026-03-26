@@ -8,7 +8,6 @@ use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
@@ -64,26 +63,18 @@ class ProductController extends Controller
 
     /**
      * DELETE /api/products/{product}
+     *
+     * Product can be deleted even if it has been used in transactions.
+     * The transaction_items.product_id will be set to NULL, but the historical
+     * snapshot (product_name, product_price, quantity, subtotal) is preserved.
      */
     public function destroy(Request $request, Product $product): JsonResponse
     {
         Gate::authorize('delete', $product);
 
-        try {
-            $product->delete();
-            return response()->json(['message' => 'Product deleted successfully.'], 200);
-        } catch (QueryException $e) {
-            // Check if it's a foreign key constraint violation (Integrity constraint violation)
-            // SQLSTATE 23000 is for integrity constraint violations
-            if ($e->getCode() == "23000" || str_contains($e->getMessage(), 'Integrity constraint violation')) {
-                return response()->json([
-                    'message' => 'Gagal menghapus: Produk ini sudah pernah digunakan dalam transaksi dan tidak bisa dihapus demi integritas data.'
-                ], 400);
-            }
-            throw $e;
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        $product->delete();
+
+        return response()->json(['message' => 'Produk berhasil dihapus.'], 200);
     }
 
     /**
